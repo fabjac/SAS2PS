@@ -16,7 +16,7 @@ public:
   void setField(int i, const std::string& s);
 
 private:
-  static const int _nb_fields = 25;
+  static const int _nb_fields = 55;
   char _sep;
   std::vector<std::string> fields;
 

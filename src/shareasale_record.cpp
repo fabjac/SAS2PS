@@ -25,8 +25,6 @@ Shareasale_record::Shareasale_record(const std::string& record, const char sep) 
       ptr++;
     }
   }
-  //for (auto& s : fields) std::cout << "field : " << s << std::endl;
-  std::cerr << "end of ctor" << std::endl;
 }
 
 std::string Shareasale_record::at(int i) const

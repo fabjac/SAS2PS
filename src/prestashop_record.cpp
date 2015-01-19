@@ -1,15 +1,14 @@
 #include "prestashop_record.h"
 #include <iostream>
+#include <exception>
+#include <stdexcept>      // std::out_of_range
 
 namespace fc
 {
 
 Prestashop_record::Prestashop_record(const char sep) :
-  _sep(sep)
+  _sep(sep), fields{_nb_fields, ""}
 {
-  for (int i=0 ; i<_nb_fields ; i++) {
-    fields.push_back("");
-  }
 }
 
 std::string Prestashop_record::asString()
@@ -27,14 +26,19 @@ std::string Prestashop_record::asString()
 void Prestashop_record::setField(int i, const std::string& s)
 {
   try {
-    fields[i] = s;
+    fields.at(i) = s;
+  }
+  catch (const std::out_of_range& e) {
+    std::cerr << "[out of range] vector index : " << i << std::endl;
+    throw;
   }
   catch (const std::exception& e) {
+    std::cerr << e.what() << std::endl;
     std::cerr << "vector index : " << i << std::endl;
     throw;
   }
   catch (...) {
-    std::cerr << "vector index : " << i << std::endl;
+    std::cerr << "[unknown exception] vector index : " << i << std::endl;
     throw;
   }
 }

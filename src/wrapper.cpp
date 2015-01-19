@@ -12,7 +12,6 @@ Wrapper::Wrapper(const char in_sep, const char out_sep) :
 
 void Wrapper::wrap(const std::string& in_str, std::string& out_str)
 {
-  out_str = in_str;
   Shareasale_record in_rec(in_str, _in_sep);
   Prestashop_record out_rec(_out_sep);
   wrap(in_rec, out_rec);
@@ -39,8 +38,51 @@ void Wrapper::wrap(const Shareasale_record& in_record, Prestashop_record& out_re
     double reduction = (old_price - new_price) / old_price;
     out_record.setField(i++, std::to_string(static_cast<int>(reduction)));
   }
-  // TODO
-  //"2000-01-01","2099-12-31",$1,$21,$3,"","","","","0","0","0","0","99","1","","","","",$2,$12,"","","","","","in stock","","1","2000-01-01","2000-01-01","1",$6,"1","","","","0","0","0","0","0","0","0","0"
+  out_record.setField(i++, "2000-01-01");
+  out_record.setField(i++, "2099-12-31");
+  out_record.setField(i++, in_record.at(1));
+  out_record.setField(i++, in_record.at(21));
+  out_record.setField(i++, in_record.at(3));
+  out_record.setField(i++, "");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "0");
+  out_record.setField(i++, "0");
+  out_record.setField(i++, "0");
+  out_record.setField(i++, "0");
+  out_record.setField(i++, "99");
+  out_record.setField(i++, "1");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "");
+  out_record.setField(i++, in_record.at(2));
+  out_record.setField(i++, in_record.at(12));
+  out_record.setField(i++, "");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "in stock");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "1");
+  out_record.setField(i++, "2000-01-01");
+  out_record.setField(i++, "2000-01-01");
+  out_record.setField(i++, "1");
+  out_record.setField(i++, in_record.at(6));
+  out_record.setField(i++, "1");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "");
+  out_record.setField(i++, "0");
+  out_record.setField(i++, "0");
+  out_record.setField(i++, "0");
+  out_record.setField(i++, "0");
+  out_record.setField(i++, "0");
+  out_record.setField(i++, "0");
+  out_record.setField(i++, "0");
+  out_record.setField(i++, "0");
 }
 
 Wrapper::~Wrapper()

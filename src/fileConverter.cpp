@@ -49,7 +49,6 @@ int main(int argc, char *argv[])
   while (! sas_file.eof()) {
     std::string in_str, out_str("");
     getline(sas_file, in_str);
-    std::cout << "line size : " << in_str.length() << std::endl;
     if (in_str.length() == 0) {
       out_str = "";
     }
