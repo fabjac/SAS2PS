@@ -10,7 +10,7 @@ namespace fc
 class Wrapper
 {
 public:
-  Wrapper(const char in_sep, const char out_sep);
+  Wrapper(const char in_sep, const char out_sep, const std::string& category);
   void wrap(const std::string& in_str, std::string& out_str);
   void wrap(const Shareasale_record& in_record, Prestashop_record& out_record);
   ~Wrapper();
@@ -18,6 +18,7 @@ public:
 private:
   char _in_sep;
   char _out_sep;
+  std::string _category;
 };
 } // end namespace
 

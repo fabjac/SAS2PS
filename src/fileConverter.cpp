@@ -8,7 +8,7 @@
 
 void usage(char * s)
 {
-    std::cerr << "usage: " << s << " -i input_file -o output_file" << std::endl;
+    std::cerr << "usage: " << s << " -i input_file -o output_file -c category" << std::endl;
 }
 
 int main(int argc, char *argv[])
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  std::string input_file(""), output_file("");
+  std::string input_file(""), output_file(""), category("");
   int i = 1;
   while (i < argc) {
     if (argv[i][0]=='-' && argv[i][1]=='i') {
@@ -26,6 +26,9 @@ int main(int argc, char *argv[])
     }
     if (argv[i][0]=='-' && argv[i][1]=='o') {
       output_file = argv[i+1];
+    }
+    if (argv[i][0]=='-' && argv[i][1]=='c') {
+      category = argv[i+1];
     }
     i+=2;
   }
@@ -39,12 +42,18 @@ int main(int argc, char *argv[])
     return 1;
   }
 
+  if (category == "") {
+    usage(argv[0]);
+    return 1;
+  }
+
   std::cout << "Input file  : " << input_file << std::endl;
   std::cout << "Output file : " << output_file << std::endl;
+  std::cout << "Category : " << category << std::endl;
 
   std::ifstream sas_file(input_file);
   std::ofstream ps_file(output_file);
-  fc::Wrapper wrapper('|', ';');
+  fc::Wrapper wrapper('|', ';', category);
 
   while (! sas_file.eof()) {
     std::string in_str, out_str("");

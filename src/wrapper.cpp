@@ -5,8 +5,8 @@
 namespace fc
 {
 
-Wrapper::Wrapper(const char in_sep, const char out_sep) :
-  _in_sep(in_sep), _out_sep(out_sep)
+Wrapper::Wrapper(const char in_sep, const char out_sep, const std::string& category) :
+  _in_sep(in_sep), _out_sep(out_sep), _category(category)
 {
 }
 
@@ -24,7 +24,7 @@ void Wrapper::wrap(const Shareasale_record& in_record, Prestashop_record& out_re
   out_record.setField(i++, in_record.at(1));
   out_record.setField(i++, "1");
   out_record.setField(i++, in_record.at(2));
-  out_record.setField(i++, "44");  // TODO cat #
+  out_record.setField(i++, _category);
   out_record.setField(i++, in_record.at(9));
   out_record.setField(i++, "0");
   out_record.setField(i++, "0");
