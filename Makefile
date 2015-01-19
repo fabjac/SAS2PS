@@ -10,6 +10,8 @@ BIN_DIR=bin
 all : $(BIN_DIR)/fileConverter
 
 SRC_FILES += fileConverter.cpp \
+	shareasale_record.cpp \
+	prestashop_record.cpp \
 	wrapper.cpp
 
 re: clean all

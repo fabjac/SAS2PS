@@ -44,12 +44,18 @@ int main(int argc, char *argv[])
 
   std::ifstream sas_file(input_file);
   std::ofstream ps_file(output_file);
-  fc::Wrapper wrapper(std::string("|"), std::string(";"));
+  fc::Wrapper wrapper('|', ';');
 
   while (! sas_file.eof()) {
     std::string in_str, out_str("");
-    sas_file >> in_str;
-    wrapper.wrap(in_str, out_str);
+    getline(sas_file, in_str);
+    std::cout << "line size : " << in_str.length() << std::endl;
+    if (in_str.length() == 0) {
+      out_str = "";
+    }
+    else {
+      wrapper.wrap(in_str, out_str);
+    }
     ps_file << out_str;
   }
 
