@@ -7,7 +7,7 @@ SRC_DIR=src
 INC_DIR=inc
 BIN_DIR=bin
 
-all : $(BIN_DIR)/fileConverter
+all : dirs $(BIN_DIR)/fileConverter
 
 SRC_FILES += fileConverter.cpp \
 	shareasale_record.cpp \
@@ -26,6 +26,10 @@ $(BIN_DIR)/fileConverter.o: $(SRC_DIR)/fileConverter.cpp
 
 $(BIN_DIR)/fileConverter: $(OBJ_FILES)
 	$(CXX) $(CXXFLAGS) -o $@ $+ $(LIB_FLAGS)
+
+.PHONY: dirs
+dirs:
+	@mkdir bin
 
 .PHONY: clean
 clean:
