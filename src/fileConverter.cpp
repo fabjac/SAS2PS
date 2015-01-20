@@ -4,6 +4,9 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <algorithm>
+#include <string>
 #include "wrapper.h"
 
 void usage(char * s)
@@ -19,6 +22,7 @@ int main(int argc, char *argv[])
   }
 
   std::string input_file(""), output_file(""), category("");
+  std::vector<std::string> matching_words{}, excluded_words{};
   int i = 1;
   while (i < argc) {
     if (argv[i][0]=='-' && argv[i][1]=='i') {
@@ -29,6 +33,16 @@ int main(int argc, char *argv[])
     }
     if (argv[i][0]=='-' && argv[i][1]=='c') {
       category = argv[i+1];
+    }
+    if (argv[i][0]=='-' && argv[i][1]=='m') {
+      std::string word{argv[i+1]};
+      std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+      matching_words.push_back(word);
+    }
+    if (argv[i][0]=='-' && argv[i][1]=='x') {
+      std::string word{argv[i+1]};
+      std::transform(word.begin(), word.end(), word.begin(), ::tolower);
+      excluded_words.push_back(word);
     }
     i+=2;
   }
@@ -53,7 +67,8 @@ int main(int argc, char *argv[])
 
   std::ifstream sas_file(input_file);
   std::ofstream ps_file(output_file);
-  fc::Wrapper wrapper('|', ';', category);
+  fc::Wrapper wrapper('|', ';', category, matching_words, excluded_words);
+  long int added_lines=0, ignored_lines=0;
 
   while (! sas_file.eof()) {
     std::string in_str, out_str("");
@@ -62,11 +77,16 @@ int main(int argc, char *argv[])
       out_str = "";
     }
     else {
-      wrapper.wrap(in_str, out_str);
+      if (wrapper.wrap(in_str, out_str))
+	added_lines += 1;
+      else
+	ignored_lines += 1;
     }
     ps_file << out_str;
   }
 
+  std::cout << added_lines << " lines added." << std::endl;
+  std::cout << ignored_lines << " lines ignored." << std::endl;
   ps_file.close();
   sas_file.close();
 

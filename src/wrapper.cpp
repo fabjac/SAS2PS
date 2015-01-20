@@ -5,17 +5,24 @@
 namespace fc
 {
 
-Wrapper::Wrapper(const char in_sep, const char out_sep, const std::string& category) :
-  _in_sep(in_sep), _out_sep(out_sep), _category(category)
+Wrapper::Wrapper(const char in_sep, const char out_sep, const std::string& category, 
+    		const std::vector<std::string>& matching_w, const std::vector<std::string>& excluded_w) :
+  _in_sep(in_sep), _out_sep(out_sep), _category(category), mw{matching_w}, xw{excluded_w}
 {
 }
 
-void Wrapper::wrap(const std::string& in_str, std::string& out_str)
+bool Wrapper::wrap(const std::string& in_str, std::string& out_str)
 {
-  Shareasale_record in_rec(in_str, _in_sep);
-  Prestashop_record out_rec(_out_sep);
-  wrap(in_rec, out_rec);
-  out_str = out_rec.asString();
+  if (match(in_str)) {
+    Shareasale_record in_rec(in_str, _in_sep);
+    Prestashop_record out_rec(_out_sep);
+    wrap(in_rec, out_rec);
+    out_str = out_rec.asString();
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 void Wrapper::wrap(const Shareasale_record& in_record, Prestashop_record& out_record)
@@ -83,6 +90,22 @@ void Wrapper::wrap(const Shareasale_record& in_record, Prestashop_record& out_re
   out_record.setField(i++, "0");
   out_record.setField(i++, "0");
   out_record.setField(i++, "0");
+}
+
+bool Wrapper::match(const std::string& s)
+{
+  if (mw.size() > 0) {
+    bool found{false};
+    for (auto& word : mw) {
+      size_t pos = s.find(word);
+      found |= (pos != std::string::npos);
+    }
+    // TODO : check excluded words
+    return found;
+  }
+  else {
+    return true;
+  }
 }
 
 Wrapper::~Wrapper()
