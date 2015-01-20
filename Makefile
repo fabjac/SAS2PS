@@ -29,7 +29,7 @@ $(BIN_DIR)/fileConverter: $(OBJ_FILES)
 
 .PHONY: dirs
 dirs:
-	@mkdir bin
+	@test -d $(BIN_DIR) || mkdir $(BIN_DIR)
 
 .PHONY: clean
 clean:
