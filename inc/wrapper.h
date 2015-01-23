@@ -16,6 +16,7 @@ public:
   bool wrap(const std::string& in_str, std::string& out_str);
   void wrap(const Shareasale_record& in_record, Prestashop_record& out_record);
   bool match(const std::string&);
+  bool doMatch(const std::string& s, const std::vector<std::string>& v, bool);
   ~Wrapper();
 
 private:

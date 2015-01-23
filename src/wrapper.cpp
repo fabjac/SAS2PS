@@ -94,18 +94,28 @@ void Wrapper::wrap(const Shareasale_record& in_record, Prestashop_record& out_re
 
 bool Wrapper::match(const std::string& s)
 {
-  if (mw.size() > 0) {
-    bool found{false};
-    for (auto& word : mw) {
+  bool found_to_exclude = doMatch(s, xw, false);
+  if (found_to_exclude)
+    return false;
+  else {
+    bool found_to_include = doMatch(s, mw, true);
+    return found_to_include;
+  }
+}
+
+bool Wrapper::doMatch(const std::string& s, const std::vector<std::string>& v, bool default_found)
+{
+  bool found{false};
+  if (v.size() > 0) {
+    for (auto& word : v) {
       size_t pos = s.find(word);
       found |= (pos != std::string::npos);
     }
-    // TODO : check excluded words
-    return found;
   }
   else {
-    return true;
+    found = default_found;
   }
+  return found;
 }
 
 Wrapper::~Wrapper()
