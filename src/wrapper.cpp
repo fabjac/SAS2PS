@@ -78,7 +78,7 @@ void Wrapper::wrap(const Shareasale_record& in_record, Prestashop_record& out_re
   out_record.setField(i++, "2000-01-01");
   out_record.setField(i++, "2000-01-01");
   out_record.setField(i++, "1");
-  out_record.setField(i++, in_record.at(5));
+  out_record.setField(i++, in_record.at(6));
   out_record.setField(i++, "1");
   out_record.setField(i++, "");
   out_record.setField(i++, "");
