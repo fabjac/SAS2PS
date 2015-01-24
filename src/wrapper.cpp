@@ -6,15 +6,16 @@ namespace fc
 {
 
 Wrapper::Wrapper(const char in_sep, const char out_sep, const std::string& category, 
-    		const std::vector<std::string>& matching_w, const std::vector<std::string>& excluded_w) :
-  _in_sep(in_sep), _out_sep(out_sep), _category(category), mw{matching_w}, xw{excluded_w}
+    		const std::vector<std::string>& matching_w, const std::vector<std::string>& excluded_w, double min_price) :
+  _in_sep(in_sep), _out_sep(out_sep), _category(category), mw{matching_w}, xw{excluded_w}, _min_price(min_price)
 {
 }
 
 bool Wrapper::wrap(const std::string& in_str, std::string& out_str)
 {
-  if (match(in_str)) {
-    Shareasale_record in_rec(in_str, _in_sep);
+  Shareasale_record in_rec(in_str, _in_sep);
+  double price = atof(in_rec.at(7).c_str());
+  if (match(in_str, price)) {
     Prestashop_record out_rec(_out_sep);
     wrap(in_rec, out_rec);
     out_str = out_rec.asString();
@@ -92,8 +93,11 @@ void Wrapper::wrap(const Shareasale_record& in_record, Prestashop_record& out_re
   out_record.setField(i++, "0");
 }
 
-bool Wrapper::match(const std::string& s)
+bool Wrapper::match(const std::string& s, double price)
 {
+  if (price < _min_price)
+    return false;
+
   bool found_to_exclude = doMatch(s, xw, false);
   if (found_to_exclude)
     return false;

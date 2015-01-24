@@ -11,7 +11,11 @@
 
 void usage(char * s)
 {
-    std::cerr << "usage: " << s << " -i input_file -o output_file -c category" << std::endl;
+    std::cerr << "usage: " << s << " -i input_file -o output_file -c category";
+    std::cerr << " -m match_word [-m match_word2] ...";
+    std::cerr << " -x exclude_word [-x exclude_word2] ...";
+    std::cerr << " -p min_price";
+    std::cerr << std::endl;
 }
 
 int main(int argc, char *argv[])
@@ -23,6 +27,7 @@ int main(int argc, char *argv[])
 
   std::string input_file(""), output_file(""), category("");
   std::vector<std::string> matching_words{}, excluded_words{};
+  double min_price=0.0;
   int i = 1;
   while (i < argc) {
     if (argv[i][0]=='-' && argv[i][1]=='i') {
@@ -37,12 +42,15 @@ int main(int argc, char *argv[])
     if (argv[i][0]=='-' && argv[i][1]=='m') {
       std::string word{argv[i+1]};
       std::transform(word.begin(), word.end(), word.begin(), ::tolower);
-      matching_words.push_back(word);
+      matching_words.push_back(" "+word+" ");
     }
     if (argv[i][0]=='-' && argv[i][1]=='x') {
       std::string word{argv[i+1]};
       std::transform(word.begin(), word.end(), word.begin(), ::tolower);
       excluded_words.push_back(word);
+    }
+    if (argv[i][0]=='-' && argv[i][1]=='p') {
+      min_price = atof(argv[i+1]);
     }
     i+=2;
   }
@@ -67,7 +75,7 @@ int main(int argc, char *argv[])
 
   std::ifstream sas_file(input_file);
   std::ofstream ps_file(output_file);
-  fc::Wrapper wrapper('|', ';', category, matching_words, excluded_words);
+  fc::Wrapper wrapper('|', ';', category, matching_words, excluded_words, min_price);
   long int added_lines=0, ignored_lines=0;
 
   while (! sas_file.eof()) {
