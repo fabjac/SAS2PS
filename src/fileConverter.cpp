@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     if (argv[i][0]=='-' && argv[i][1]=='x') {
       std::string word{argv[i+1]};
       std::transform(word.begin(), word.end(), word.begin(), ::tolower);
-      excluded_words.push_back(word);
+      excluded_words.push_back(" "+word+" ");
     }
     if (argv[i][0]=='-' && argv[i][1]=='p') {
       min_price = atof(argv[i+1]);

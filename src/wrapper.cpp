@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "wrapper.h"
 #include "shareasale_record.h"
 #include "prestashop_record.h"
@@ -15,7 +16,11 @@ bool Wrapper::wrap(const std::string& in_str, std::string& out_str)
 {
   Shareasale_record in_rec(in_str, _in_sep);
   double price = atof(in_rec.at(7).c_str());
-  if (match(in_str, price)) {
+  std::string desc{in_rec.at(1)};
+  desc += " " + in_rec.at(11);
+  desc += " " + in_rec.at(23);
+  std::transform(desc.begin(), desc.end(), desc.begin(), ::tolower);
+  if (match(desc, price)) {
     Prestashop_record out_rec(_out_sep);
     wrap(in_rec, out_rec);
     out_str = out_rec.asString();
