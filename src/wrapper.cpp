@@ -127,8 +127,11 @@ bool Wrapper::doMatch(const std::string& s, const std::vector<std::string>& v, b
   bool found{false};
   if (v.size() > 0) {
     for (auto& word : v) {
-      size_t pos = s.find(word);
-      found |= (pos != std::string::npos);
+      std::vector<std::string> v2 = Tools::getCompleteWord(word);
+      for (auto& word2 : v2) {
+	size_t pos = s.find(word2);
+	found |= (pos != std::string::npos);
+      }
     }
   }
   else {
