@@ -1,6 +1,7 @@
 #include <sstream>
 #include <iostream>
 #include "shareasale_record.h"
+#include "tools.h"
 
 namespace fc
 {
@@ -10,6 +11,7 @@ Shareasale_record::Shareasale_record(const std::string& record, const char sep) 
 {
   fields.clear();
   std::string rec(record);
+  update_html_entities(rec);
   rec += std::string(1, sep);
   int lg = rec.length();
   int ptr = 0;
@@ -25,6 +27,17 @@ Shareasale_record::Shareasale_record(const std::string& record, const char sep) 
       ptr++;
     }
   }
+}
+
+void Shareasale_record::update_html_entities(std::string& s)
+{
+  Tools::strReplace(s, "&amp;", "&");
+  Tools::strReplace(s, "&apos;", "'");
+  Tools::strReplace(s, "&quot;", "\"");
+  Tools::strReplace(s, "&lt;", "<");
+  Tools::strReplace(s, "&gt;", ">");
+  Tools::strReplace(s, "&copy;", "(c)");
+  Tools::strReplace(s, "&reg;", "(r)");
 }
 
 std::string Shareasale_record::at(int i) const

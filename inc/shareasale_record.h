@@ -22,6 +22,8 @@ private:
   // fields
   long int _product_id;
   std::string _name;
+
+  void update_html_entities(std::string& s);
 };
 } // end namespace
 
