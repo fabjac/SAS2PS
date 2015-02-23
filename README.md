@@ -1,6 +1,7 @@
-# fileConverter
+# SAS2PS
 convert CSV feeds from shareasale.com to prestashop CSV format
-update price in database if product already exists
+
+update products in database if they already exists
 
 INSTALL
 -------
@@ -9,10 +10,13 @@ Requirements :
 - a C++ compiler (C++11 compliant)
 
 Dependencies :
+
 mysql++
+
 mysql++-dev
 
 in fileConverter directory, type :
+
 make
 
 tested with GCC 4.8.2
