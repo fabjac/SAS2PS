@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <string>
 #include "wrapper.h"
+#include "database.h"
 
 void usage(char * s)
 {
@@ -15,6 +16,7 @@ void usage(char * s)
     std::cerr << " -m match_word [-m match_word2] ...";
     std::cerr << " -x exclude_word [-x exclude_word2] ...";
     std::cerr << " -p min_price";
+    std::cerr << " -d db_name -s db_server -u db_user -a db_password";
     std::cerr << std::endl;
 }
 
@@ -26,10 +28,23 @@ int main(int argc, char *argv[])
   }
 
   std::string input_file(""), output_file(""), category("");
+  std::string db_name(""), db_server(""), db_user(""), db_password("");
   std::vector<std::string> matching_words{}, excluded_words{};
   double min_price=0.0;
   int i = 1;
   while (i < argc) {
+    if (argv[i][0]=='-' && argv[i][1]=='d') {
+      db_name = argv[i+1];
+    }
+    if (argv[i][0]=='-' && argv[i][1]=='s') {
+      db_server = argv[i+1];
+    }
+    if (argv[i][0]=='-' && argv[i][1]=='u') {
+      db_user = argv[i+1];
+    }
+    if (argv[i][0]=='-' && argv[i][1]=='a') {
+      db_password = argv[i+1];
+    }
     if (argv[i][0]=='-' && argv[i][1]=='i') {
       input_file = argv[i+1];
     }
@@ -72,11 +87,13 @@ int main(int argc, char *argv[])
   std::cout << "Input file  : " << input_file << std::endl;
   std::cout << "Output file : " << output_file << std::endl;
   std::cout << "Category : " << category << std::endl;
+  std::cout << "Connecting to " << db_user << "@" << db_name << " on server " << db_server << std::endl;
 
   std::ifstream sas_file(input_file);
   std::ofstream ps_file(output_file);
   fc::Wrapper wrapper('|', ';', category, matching_words, excluded_words, min_price);
-  long int added_lines=0, ignored_lines=0;
+  long int added_lines=0, ignored_lines=0, updated_lines=0;
+  fc::Database db(db_name, db_server, db_user, db_password);
 
   while (! sas_file.eof()) {
     std::string in_str, out_str("");
@@ -85,14 +102,20 @@ int main(int argc, char *argv[])
       out_str = "";
     }
     else {
-      if (wrapper.wrap(in_str, out_str))
-	added_lines += 1;
-      else
-	ignored_lines += 1;
+      if (db.update(in_str, '|')) {
+	updated_lines += 1;
+      }
+      else {
+	if (wrapper.wrap(in_str, out_str))
+	  added_lines += 1;
+	else
+	  ignored_lines += 1;
+      }
     }
     ps_file << out_str;
   }
 
+  std::cout << updated_lines << " lines updated." << std::endl;
   std::cout << added_lines << " lines added." << std::endl;
   std::cout << ignored_lines << " lines ignored." << std::endl;
   ps_file.close();

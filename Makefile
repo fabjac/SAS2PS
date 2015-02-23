@@ -1,7 +1,8 @@
 CXX=g++
 LIB_FLAGS = 
-CXXFLAGS = -I inc
+CXXFLAGS = -I inc -I /usr/include/mysql++ -I /usr/include/mysql
 CXXFLAGS += -g --std=c++0x -Wall -Wextra -Wfatal-errors
+LDFLAGS = -L/usr/local/lib -lmysqlpp -lmysqlclient -lnsl -lz -lm
 
 SRC_DIR=src
 INC_DIR=inc
@@ -10,6 +11,7 @@ BIN_DIR=bin
 all : dirs $(BIN_DIR)/fileConverter
 
 SRC_FILES += fileConverter.cpp \
+	database.cpp \
 	tools.cpp \
 	shareasale_record.cpp \
 	prestashop_record.cpp \
@@ -26,7 +28,7 @@ $(BIN_DIR)/fileConverter.o: $(SRC_DIR)/fileConverter.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@  $< $(LIB_FLAGS)
 
 $(BIN_DIR)/fileConverter: $(OBJ_FILES)
-	$(CXX) $(CXXFLAGS) -o $@ $+ $(LIB_FLAGS)
+	$(CXX) $(CXXFLAGS) -o $@ $+ $(LIB_FLAGS) $(LDFLAGS)
 
 .PHONY: dirs
 dirs:
