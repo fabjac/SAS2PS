@@ -24,6 +24,7 @@ bool Database::update(const string& in_str, const char _in_sep)
   long id_product = atol(in_rec.at(0).c_str());
   double price = atof(in_rec.at(7).c_str());
   try {
+    query.reset();
     query << "update product set price = %0q where id_product= %1q";
     query.parse();
     SimpleResult res = query.execute(price, id_product);

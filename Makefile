@@ -8,9 +8,9 @@ SRC_DIR=src
 INC_DIR=inc
 BIN_DIR=bin
 
-all : dirs $(BIN_DIR)/fileConverter
+all : dirs $(BIN_DIR)/sas2ps
 
-SRC_FILES += fileConverter.cpp \
+SRC_FILES += sas2ps.cpp \
 	database.cpp \
 	tools.cpp \
 	shareasale_record.cpp \
@@ -24,10 +24,10 @@ OBJ_FILES = $(SRC_FILES:%.cpp=$(BIN_DIR)/%.o)
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp $(INC_DIR)/%.h
 	$(CXX) $(CXXFLAGS) -c -o $@  $< $(LIB_FLAGS)
 
-$(BIN_DIR)/fileConverter.o: $(SRC_DIR)/fileConverter.cpp
+$(BIN_DIR)/sas2ps.o: $(SRC_DIR)/sas2ps.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@  $< $(LIB_FLAGS)
 
-$(BIN_DIR)/fileConverter: $(OBJ_FILES)
+$(BIN_DIR)/sas2ps: $(OBJ_FILES)
 	$(CXX) $(CXXFLAGS) -o $@ $+ $(LIB_FLAGS) $(LDFLAGS)
 
 .PHONY: dirs
@@ -36,5 +36,5 @@ dirs:
 
 .PHONY: clean
 clean:
-	cd $(BIN_DIR) && rm -f fileConverter *.o
+	cd $(BIN_DIR) && rm -f sas2ps *.o
 
