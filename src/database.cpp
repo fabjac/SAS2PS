@@ -1,5 +1,6 @@
 #include "database.h"
 #include "shareasale_record.h"
+#include "tools.h"
 #include <iostream>
 #include <iomanip>
 
@@ -28,6 +29,12 @@ bool Database::update(const string& in_str, const char _in_sep)
     query << "update product set price = %0q where id_product= %1q";
     query.parse();
     SimpleResult res = query.execute(price, id_product);
+    Tools::debug("id product", to_string(id_product));
+    Tools::debug("affected row(s)", to_string(query.affected_rows()));
+    if (query.affected_rows() > 0)
+      return true;
+    else
+      return false;
   }
   catch (const mysqlpp::BadQuery& er) {
     // Handle any query errors
@@ -46,7 +53,6 @@ bool Database::update(const string& in_str, const char _in_sep)
     cerr << "Error: " << er.what() << endl;
     return false;
   }
-  return true;
 }
 
 } // end namespace fc
