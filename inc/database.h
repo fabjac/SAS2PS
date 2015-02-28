@@ -20,6 +20,8 @@ public:
   Database(string db, string host, string user, string passwd);
   ~Database();
 
+  bool product_exist(const string& in_str, const char _in_sep);
+  bool product_exist(long id_product);
   template <class T> bool do_update(const string& q, long id_product, T v);
   bool update(const string& in_str, const char _in_sep);
 

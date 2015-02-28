@@ -19,6 +19,21 @@ Database::~Database()
 {
 }
 
+bool Database::product_exist(const string& in_str, const char _in_sep)
+{
+  Shareasale_record in_rec(in_str, _in_sep);
+  long id_product = atol(in_rec.at(0).c_str());
+  return product_exist(id_product);
+}
+
+bool Database::product_exist(long id_product)
+{
+  query.reset();
+  query << "select 1 from product where id_product=" << id_product;
+  StoreQueryResult res = query.store();
+  return res.size();
+}
+
 template <class T>
 bool Database::do_update(const string& q, long id_product, T v)
 {
@@ -41,6 +56,7 @@ bool Database::do_update(const string& q, long id_product, T v)
     // Handle any query errors
     cerr << "Query error: " << er.what() << endl;
     cerr << q << endl;
+    cerr << query.str() << endl;
     Tools::debug("id product", id_product);
     Tools::debug("value", v);
     throw;
@@ -51,6 +67,7 @@ bool Database::do_update(const string& q, long id_product, T v)
       "\tretrieved data size: " << er.retrieved <<
       ", actual size: " << er.actual_size << endl;
     cerr << q << endl;
+    cerr << query.str() << endl;
     Tools::debug("id product", id_product);
     Tools::debug("value", v);
     throw;
@@ -59,6 +76,15 @@ bool Database::do_update(const string& q, long id_product, T v)
     // Catch-all for any other MySQL++ exceptions
     cerr << "Error: " << er.what() << endl;
     cerr << q << endl;
+    cerr << query.str() << endl;
+    Tools::debug("id product", id_product);
+    Tools::debug("value", v);
+    throw;
+  }
+  catch (...) {
+    cerr << "Unknown error: " << endl;
+    cerr << q << endl;
+    cerr << query.str() << endl;
     Tools::debug("id product", id_product);
     Tools::debug("value", v);
     throw;

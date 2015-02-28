@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
   std::ifstream sas_file(input_file);
   std::ofstream ps_file(output_file);
   fc::Wrapper wrapper('|', ';', category, matching_words, excluded_words, min_price);
-  long int added_lines=0, ignored_lines=0, updated_lines=0;
+  long int added_lines=0, ignored_lines=0, updated_lines=0, up_to_date=0;
   fc::Database db(db_name, db_server, db_user, db_password);
 
   while (! sas_file.eof()) {
@@ -102,8 +102,12 @@ int main(int argc, char *argv[])
       out_str = "";
     }
     else {
-      if (db.update(in_str, '|')) {
-	updated_lines += 1;
+      if (db.product_exist(in_str, '|')) {
+	if (db.update(in_str, '|')) {
+	  updated_lines += 1;
+	}
+	else
+	  up_to_date += 1;
       }
       else {
 	if (wrapper.wrap(in_str, out_str))
@@ -116,6 +120,7 @@ int main(int argc, char *argv[])
   }
 
   std::cout << updated_lines << " lines updated." << std::endl;
+  std::cout << up_to_date << " products up-to-date." << std::endl;
   std::cout << added_lines << " lines added." << std::endl;
   std::cout << ignored_lines << " lines ignored." << std::endl;
   ps_file.close();
