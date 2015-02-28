@@ -19,40 +19,74 @@ Database::~Database()
 {
 }
 
-bool Database::update(const string& in_str, const char _in_sep)
+template <class T>
+bool Database::do_update(const string& q, long id_product, T v)
 {
-  Shareasale_record in_rec(in_str, _in_sep);
-  long id_product = atol(in_rec.at(0).c_str());
-  double price = atof(in_rec.at(7).c_str());
   try {
     query.reset();
-    query << "update product set price = %0q where id_product= %1q";
+    query << q;
     query.parse();
-    SimpleResult res = query.execute(price, id_product);
-    Tools::debug("id product", to_string(id_product));
+    SimpleResult res = query.execute(v, id_product);
+    Tools::debug("id product", id_product);
+    Tools::debug("value", v);
     Tools::debug("affected row(s)", to_string(query.affected_rows()));
-    if (query.affected_rows() > 0)
+    if (query.affected_rows() > 0) {
+      Tools::debug("query", q);
       return true;
+    }
     else
       return false;
   }
   catch (const mysqlpp::BadQuery& er) {
     // Handle any query errors
     cerr << "Query error: " << er.what() << endl;
-    return false;
+    cerr << q << endl;
+    Tools::debug("id product", id_product);
+    Tools::debug("value", v);
+    throw;
   }
   catch (const mysqlpp::BadConversion& er) {
     // Handle bad conversions
     cerr << "Conversion error: " << er.what() << endl <<
       "\tretrieved data size: " << er.retrieved <<
       ", actual size: " << er.actual_size << endl;
-    return false;
+    cerr << q << endl;
+    Tools::debug("id product", id_product);
+    Tools::debug("value", v);
+    throw;
   }
   catch (const mysqlpp::Exception& er) {
     // Catch-all for any other MySQL++ exceptions
     cerr << "Error: " << er.what() << endl;
-    return false;
+    cerr << q << endl;
+    Tools::debug("id product", id_product);
+    Tools::debug("value", v);
+    throw;
   }
+}
+
+bool Database::update(const string& in_str, const char _in_sep)
+{
+  Shareasale_record in_rec(in_str, _in_sep);
+  long id_product = atol(in_rec.at(0).c_str());
+  bool res {false};
+
+  // update price
+  double price = atof(in_rec.at(7).c_str());
+  res |= do_update("update product set price = %0q where id_product= %1q", id_product, price);
+  res |= do_update("update product_shop set price = %0q where id_product= %1q", id_product, price);
+
+  // update name
+  res |= do_update("update product_lang set name = %0q where id_product= %1q", id_product, in_rec.at(1));
+
+  // TODO: fix encoding issue with UTF-8
+  // update description
+  //res |= do_update("update product_lang set description = %0q where id_product= %1q", id_product, in_rec.at(11));
+
+  // TODO
+  // update description_short
+
+  return res;
 }
 
 } // end namespace fc

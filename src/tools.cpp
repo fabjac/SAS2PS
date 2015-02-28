@@ -4,12 +4,6 @@
 namespace fc
 {
 
-// TODO use debug level INFO, WARN, FATAL...
-void Tools::debug(const std::string& s1, const std::string& lib)
-{
-  std::cerr << "[" << s1 << "] " << lib << std::endl;
-}
-
 // TODO : use regex when it's implemented in GCC
 std::vector<std::string> Tools::getCompleteWord(const std::string& word)
 {
