@@ -1,7 +1,7 @@
 CXX=g++
 LIB_FLAGS = 
 CXXFLAGS = -I inc -I /usr/include/mysql++ -I /usr/include/mysql
-CXXFLAGS += -g --std=c++0x -Wall -Wextra -Wfatal-errors
+CXXFLAGS += -g --std=c++11 -Wall -Wextra -Wfatal-errors
 LDFLAGS = -L/usr/local/lib -lmysqlpp -lmysqlclient -lnsl -lz -lm
 
 SRC_DIR=src
@@ -11,8 +11,8 @@ BIN_DIR=bin
 all : dirs $(BIN_DIR)/sas2ps
 
 SRC_FILES += sas2ps.cpp \
-	database.cpp \
 	tools.cpp \
+	database.cpp \
 	shareasale_record.cpp \
 	prestashop_record.cpp \
 	wrapper.cpp

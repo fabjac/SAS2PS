@@ -9,6 +9,7 @@
 #include <string>
 #include "wrapper.h"
 #include "database.h"
+#include "tools.h"
 
 void usage(char * s)
 {
@@ -69,6 +70,9 @@ int main(int argc, char *argv[])
     }
     i+=2;
   }
+
+  // FIXME
+  fc::Tools::setDebugLevel(fc::E_level::INFO);
 
   if (input_file=="") {
     usage(argv[0]);
