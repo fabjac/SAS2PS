@@ -42,11 +42,11 @@ bool Database::do_update(const string& q, long id_product, T v)
     query << q;
     query.parse();
     SimpleResult res = query.execute(v, id_product);
-    Tools::debug("id product", id_product);
-    Tools::debug("value", v);
-    Tools::debug("affected row(s)", to_string(query.affected_rows()));
+    Tools::log(E_level::INFO, "id product", id_product);
+    Tools::log(E_level::INFO, "value", v);
+    Tools::log(E_level::INFO, "affected row(s)", to_string(query.affected_rows()));
     if (query.affected_rows() > 0) {
-      Tools::debug("query", q);
+      Tools::log(E_level::INFO, "query", q);
       return true;
     }
     else
@@ -57,8 +57,8 @@ bool Database::do_update(const string& q, long id_product, T v)
     cerr << "Query error: " << er.what() << endl;
     cerr << q << endl;
     cerr << query.str() << endl;
-    Tools::debug("id product", id_product);
-    Tools::debug("value", v);
+    Tools::log(E_level::FATAL, "id product", id_product);
+    Tools::log(E_level::FATAL, "value", v);
     throw;
   }
   catch (const mysqlpp::BadConversion& er) {
@@ -68,8 +68,8 @@ bool Database::do_update(const string& q, long id_product, T v)
       ", actual size: " << er.actual_size << endl;
     cerr << q << endl;
     cerr << query.str() << endl;
-    Tools::debug("id product", id_product);
-    Tools::debug("value", v);
+    Tools::log(E_level::FATAL, "id product", id_product);
+    Tools::log(E_level::FATAL, "value", v);
     throw;
   }
   catch (const mysqlpp::Exception& er) {
@@ -77,16 +77,16 @@ bool Database::do_update(const string& q, long id_product, T v)
     cerr << "Error: " << er.what() << endl;
     cerr << q << endl;
     cerr << query.str() << endl;
-    Tools::debug("id product", id_product);
-    Tools::debug("value", v);
+    Tools::log(E_level::FATAL, "id product", id_product);
+    Tools::log(E_level::FATAL, "value", v);
     throw;
   }
   catch (...) {
     cerr << "Unknown error: " << endl;
     cerr << q << endl;
     cerr << query.str() << endl;
-    Tools::debug("id product", id_product);
-    Tools::debug("value", v);
+    Tools::log(E_level::FATAL, "id product", id_product);
+    Tools::log(E_level::FATAL, "value", v);
     throw;
   }
 }

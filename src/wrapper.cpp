@@ -101,21 +101,21 @@ void Wrapper::wrap(const Shareasale_record& in_record, Prestashop_record& out_re
 bool Wrapper::match(const std::string& s, double price)
 {
   if (price < _min_price) {
-    Tools::debug("DO_NOT_MATCH", "price " + std::to_string(price) + " is too low");
+    Tools::log(E_level::DEBUG, "DO_NOT_MATCH", "price " + std::to_string(price) + " is too low");
     return false;
   }
 
   bool found_to_exclude = doMatch(s, xw, false);
   if (found_to_exclude) {
-    Tools::debug("DO_NOT_MATCH", "found word to exclude in : " + s);
+    Tools::log(E_level::DEBUG, "DO_NOT_MATCH", "found word to exclude in : " + s);
     return false;
   }
   else {
     bool found_to_include = doMatch(s, mw, true);
     if (found_to_include)
-      Tools::debug("DO_MATCH", "found word to include in : " + s);
+      Tools::log(E_level::DEBUG, "DO_MATCH", "found word to include in : " + s);
     else
-      Tools::debug("DO_NOT_MATCH", "did not found word to include in : " + s);
+      Tools::log(E_level::DEBUG, "DO_NOT_MATCH", "did not found word to include in : " + s);
     return found_to_include;
   }
 }

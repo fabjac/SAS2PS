@@ -17,7 +17,7 @@ void usage(char * s)
     std::cerr << " -m match_word [-m match_word2] ...";
     std::cerr << " -x exclude_word [-x exclude_word2] ...";
     std::cerr << " -p min_price";
-    std::cerr << " -d db_name -s db_server -u db_user -a db_password";
+    std::cerr << " -d debug_level -n db_name -s db_server -u db_user -a db_password";
     std::cerr << std::endl;
 }
 
@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
     return 1;
   }
 
+  short int debug_level=3;
   std::string input_file(""), output_file(""), category("");
   std::string db_name(""), db_server(""), db_user(""), db_password("");
   std::vector<std::string> matching_words{}, excluded_words{};
@@ -35,6 +36,9 @@ int main(int argc, char *argv[])
   int i = 1;
   while (i < argc) {
     if (argv[i][0]=='-' && argv[i][1]=='d') {
+      debug_level = atoi(argv[i+1]);
+    }
+    if (argv[i][0]=='-' && argv[i][1]=='n') {
       db_name = argv[i+1];
     }
     if (argv[i][0]=='-' && argv[i][1]=='s') {
@@ -71,8 +75,8 @@ int main(int argc, char *argv[])
     i+=2;
   }
 
-  // FIXME
-  fc::Tools::setDebugLevel(fc::E_level::INFO);
+  fc::Tools::setDebugLevel(debug_level);
+  fc::Tools::log(fc::E_level::INFO, "JOB", "Starting");
 
   if (input_file=="") {
     usage(argv[0]);
@@ -123,13 +127,13 @@ int main(int argc, char *argv[])
     ps_file << out_str;
   }
 
-  std::cout << updated_lines << " lines updated." << std::endl;
-  std::cout << up_to_date << " products up-to-date." << std::endl;
-  std::cout << added_lines << " lines added." << std::endl;
-  std::cout << ignored_lines << " lines ignored." << std::endl;
+  fc::Tools::log(fc::E_level::INFO, "updated products", updated_lines);
+  fc::Tools::log(fc::E_level::INFO, "up-to-date products", up_to_date);
+  fc::Tools::log(fc::E_level::INFO, "added products", added_lines);
+  fc::Tools::log(fc::E_level::INFO, "ignored products", ignored_lines);
   ps_file.close();
   sas_file.close();
 
-  return 0;
+  fc::Tools::log(fc::E_level::INFO, "JOB", "End");
 }
 

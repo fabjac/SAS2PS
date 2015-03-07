@@ -12,17 +12,21 @@ LOG_DIR=/tmp/sas2ps.log
 
 test "$1" = '' && usage
 test ! -f "$1" && usage
+IN_FILE=$1
 test "$2" = '' && usage
 test ! -f "$2" && usage
 
 source $2
-PARAMS="-d $DB_NAME -s $DB_SERVER -u $DB_USER -a $DB_PASSWORD"
+PARAMS="-n $DB_NAME -s $DB_SERVER -u $DB_USER -a $DB_PASSWORD"
+
+shift 2
+PARAMS="$PARAMS $*"
 
 rm -rf $SOURCE_DIR $LOG_DIR 2>/dev/null
 mkdir $SOURCE_DIR $LOG_DIR
 
 cd $SOURCE_DIR
-split -l 1000 $1 splitted.$(basename $1).
+split -l 1000 $IN_FILE splitted.$(basename $IN_FILE).
 
 cd -
 ls -1 $SOURCE_DIR | while read fic
