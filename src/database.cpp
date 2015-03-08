@@ -1,22 +1,33 @@
 #include "database.h"
 #include "shareasale_record.h"
 #include "tools.h"
+#include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <string.h>
 
 using namespace std;
-using namespace mysqlpp;
 
 namespace fc
 {
 Database::Database(string db, string host, string user, string passwd)
-  : connection((const char *) db.c_str(), (const char *) host.c_str(), (const char *) user.c_str(), (const char *) passwd.c_str()),
-  query(&connection)
 {
+  mysql_init(&mysql);
+  if (!mysql_real_connect(&mysql,host.c_str(),user.c_str(),passwd.c_str(),db.c_str(),0,NULL,0))
+  {
+    Tools::log(E_level::FATAL, "mysql_real_connect()", mysql_error(&mysql));
+    exit(1);
+  }
+
+  if (!mysql_set_character_set(&mysql, "utf8"))
+  {
+    Tools::log(E_level::INFO, "New client character set", mysql_character_set_name(&mysql));
+  }
 }
 
 Database::~Database()
 {
+  mysql_close(&mysql);
 }
 
 bool Database::product_exist(const string& in_str, const char _in_sep)
@@ -28,65 +39,63 @@ bool Database::product_exist(const string& in_str, const char _in_sep)
 
 bool Database::product_exist(long id_product)
 {
-  query.reset();
-  query << "select 1 from product where id_product=" << id_product;
-  StoreQueryResult res = query.store();
-  return res.size();
+  std::string query = "select 1 from product where id_product=" + std::to_string(id_product);
+  Tools::log(E_level::TRACE, "product_exist()", query);
+  int r = mysql_query(&mysql, query.c_str());
+  Tools::log(E_level::TRACE, "return", r);
+  if (r != 0) {
+    Tools::log(E_level::FATAL, "mysql error", mysql_error(&mysql));
+    throw std::exception();
+  }
+  MYSQL_RES * res = mysql_store_result(&mysql);
+  r = (int) mysql_num_rows(res);
+  Tools::log(E_level::TRACE, "affected rows", r);
+  return r;
 }
 
-template <class T>
-bool Database::do_update(const string& q, long id_product, T v)
+std::string Database::escape_string(const std::string& s)
+{
+  const char * ch = s.c_str();
+  int lg = strlen(ch);
+  char ch2[2 * lg];
+  try {
+    //TODO: use mysql_real_escape_string_quote with a newer release of mysqlclient library
+    //int r = mysql_real_escape_string_quote(&mysql, ch2, ch, lg,'\'');
+    int r = mysql_real_escape_string(&mysql, ch2, ch, lg);
+    Tools::log(E_level::TRACE, "mysql_real_escape_string() return", r);
+    if (r <= 0) {
+      throw std::exception();
+    }
+    return ch2;
+  }
+  catch (...) {
+    Tools::log(E_level::FATAL, "escape_string()", "Unknown error");
+    Tools::log(E_level::FATAL, "in string", string(ch));
+    Tools::log(E_level::FATAL, "out string", string(ch2));
+    throw;
+  }
+}
+
+bool Database::do_update(const char * q)
 {
   try {
-    query.reset();
-    query << q;
-    query.parse();
-    SimpleResult res = query.execute(v, id_product);
-    Tools::log(E_level::INFO, "id product", id_product);
-    Tools::log(E_level::INFO, "value", v);
-    Tools::log(E_level::INFO, "affected row(s)", to_string(query.affected_rows()));
-    if (query.affected_rows() > 0) {
-      Tools::log(E_level::INFO, "query", q);
-      return true;
+    Tools::log(E_level::TRACE, "do_update() query", string(q));
+    int r = mysql_query(&mysql, q);
+    Tools::log(E_level::TRACE, "return", r);
+    if (r != 0) {
+      Tools::log(E_level::FATAL, "mysql error", mysql_error(&mysql));
+      throw std::exception();
     }
+    r = (int) mysql_affected_rows(&mysql);
+    Tools::log(E_level::TRACE, "affected rows", r);
+    if (r > 0)
+      return true;
     else
       return false;
   }
-  catch (const mysqlpp::BadQuery& er) {
-    // Handle any query errors
-    cerr << "Query error: " << er.what() << endl;
-    cerr << q << endl;
-    cerr << query.str() << endl;
-    Tools::log(E_level::FATAL, "id product", id_product);
-    Tools::log(E_level::FATAL, "value", v);
-    throw;
-  }
-  catch (const mysqlpp::BadConversion& er) {
-    // Handle bad conversions
-    cerr << "Conversion error: " << er.what() << endl <<
-      "\tretrieved data size: " << er.retrieved <<
-      ", actual size: " << er.actual_size << endl;
-    cerr << q << endl;
-    cerr << query.str() << endl;
-    Tools::log(E_level::FATAL, "id product", id_product);
-    Tools::log(E_level::FATAL, "value", v);
-    throw;
-  }
-  catch (const mysqlpp::Exception& er) {
-    // Catch-all for any other MySQL++ exceptions
-    cerr << "Error: " << er.what() << endl;
-    cerr << q << endl;
-    cerr << query.str() << endl;
-    Tools::log(E_level::FATAL, "id product", id_product);
-    Tools::log(E_level::FATAL, "value", v);
-    throw;
-  }
   catch (...) {
-    cerr << "Unknown error: " << endl;
-    cerr << q << endl;
-    cerr << query.str() << endl;
-    Tools::log(E_level::FATAL, "id product", id_product);
-    Tools::log(E_level::FATAL, "value", v);
+    Tools::log(E_level::FATAL, "do_update()", "Unknown error");
+    Tools::log(E_level::FATAL, "q", string(q));
     throw;
   }
 }
@@ -96,21 +105,24 @@ bool Database::update(const string& in_str, const char _in_sep)
   Shareasale_record in_rec(in_str, _in_sep);
   long id_product = atol(in_rec.at(0).c_str());
   bool res {false};
+  std::stringstream ss{};
 
   // update price
   double price = atof(in_rec.at(7).c_str());
-  res |= do_update("update product set price = %0q where id_product= %1q", id_product, price);
-  res |= do_update("update product_shop set price = %0q where id_product= %1q", id_product, price);
+  ss << "update product set price = " << price << " where id_product = " << id_product;
+  res |= do_update(std::string(ss.str()).c_str());
+
+  ss.str(""); ss.clear();
+  ss << "update product_shop set price = " << price << " where id_product = " << id_product;
+  res |= do_update(std::string(ss.str()).c_str());
 
   // update name
-  res |= do_update("update product_lang set name = %0q where id_product= %1q", id_product, in_rec.at(1));
-
-  // TODO: fix encoding issue with UTF-8
-  // update description
-  //res |= do_update("update product_lang set description = %0q where id_product= %1q", id_product, in_rec.at(11));
-
-  // TODO
-  // update description_short
+  ss.str(""); ss.clear();
+  ss << "update product_lang set name = '" << escape_string(in_rec.at(1)) \
+    << "', description = '" << escape_string(in_rec.at(11)) \
+    << "', description_short = '" << escape_string(in_rec.at(1)) \
+    << "' where id_product = " << id_product;
+  res |= do_update(std::string(ss.str()).c_str());
 
   return res;
 }

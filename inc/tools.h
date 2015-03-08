@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace fc
 {
@@ -16,18 +17,19 @@ public:
   {
     if (lvl >= Tools::_lvl) {
       std::string sLevel = getStrLevel(lvl);
-      std::cerr << currentDateTime() << " " << sLevel << " " << msg << " " << v << std::endl;
+      std::cerr << currentDateTime() << " " << sLevel << " " << msg << " : " << v << std::endl;
     }
   };
 
   static std::vector<std::string> getCompleteWord(const std::string& word);
   static void strReplace(std::string& subject, const std::string& search, const std::string& replace);
+
+  // FIXME
   //static void setDebugLevel(E_level level)
   static void setDebugLevel(short int level)
-{
-  Tools::_lvl = static_cast<E_level>(level);
-  std::cout << getStrLevel(Tools::_lvl);
-};
+  {
+    Tools::_lvl = static_cast<E_level>(level);
+  };
 
   static E_level _lvl;
 

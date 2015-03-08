@@ -1,16 +1,10 @@
 #ifndef _DATABASE_INC_H_
 #define _DATABASE_INC_H_
 
-#include <mysql++.h>
-/*
-#include "shareasale_record.h"
-#include "prestashop_record.h"
+#include <mysql/mysql.h>
 #include <string>
-#include <vector>
-*/
 
 using namespace std;
-using namespace mysqlpp;
 
 namespace fc
 {
@@ -22,12 +16,13 @@ public:
 
   bool product_exist(const string& in_str, const char _in_sep);
   bool product_exist(long id_product);
-  template <class T> bool do_update(const string& q, long id_product, T v);
+  bool do_update(const char * q);
   bool update(const string& in_str, const char _in_sep);
 
 private:
-  Connection connection;
-  Query query;
+  MYSQL mysql;
+
+  std::string escape_string(const string&);
 
 };
 } // end namespace
