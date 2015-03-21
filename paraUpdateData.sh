@@ -9,6 +9,7 @@ usage()
 
 SOURCE_DIR=/tmp/sas2ps.data
 LOG_DIR=/tmp/sas2ps.log
+NB_PROC=20
 
 test "$1" = '' && usage
 test ! -f "$1" && usage
@@ -26,7 +27,10 @@ rm -rf $SOURCE_DIR $LOG_DIR 2>/dev/null
 mkdir $SOURCE_DIR $LOG_DIR
 
 cd $SOURCE_DIR
-split -l 1000 $IN_FILE splitted.$(basename $IN_FILE).
+NB_SPLIT=$(cat $IN_FILE |wc -l)
+NB_SPLIT=$(expr $NB_SPLIT / $NB_PROC)
+NB_SPLIT=$(expr $NB_SPLIT + 1)
+split -l $NB_SPLIT $IN_FILE splitted.$(basename $IN_FILE).
 
 cd -
 ls -1 $SOURCE_DIR | while read fic
