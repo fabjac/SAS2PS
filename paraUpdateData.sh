@@ -13,7 +13,7 @@ NB_PROC=20
 
 test "$1" = '' && usage
 test ! -f "$1" && usage
-IN_FILE=$1
+IN_FILE=$(readlink -f $1)
 test "$2" = '' && usage
 test ! -f "$2" && usage
 
